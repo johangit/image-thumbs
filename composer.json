@@ -3,7 +3,10 @@
   "type": "library",
   "description": "trait for create image thumbs for models via InterventionImage",
   "license": "MIT",
-  "keywords": ["laravel","image"],
+  "keywords": [
+    "laravel",
+    "image"
+  ],
   "homepage": "https://github.com/johangit/image-thumbs",
   "authors": [
     {
@@ -14,6 +17,13 @@
   "autoload": {
     "psr-4": {
       "JohanCode\\ImageThumbs\\": "src"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "JohanCode\\ImageThumbs\\ServiceProvider"
+      ]
     }
   }
 }
