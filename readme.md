@@ -1,5 +1,6 @@
 # Laravel image thumbs
 
+
 Trait for create image thumbs for models via InterventionImage.
 
 
