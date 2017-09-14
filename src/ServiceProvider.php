@@ -9,7 +9,6 @@ class ServiceProvider extends LServiceProvider
 
     public function boot()
     {
-        //Указываем что пакет должен опубликовать при установке
         $this->publishes([__DIR__ . '/../config/' => config_path() . "/"], 'config');
     }
 }
