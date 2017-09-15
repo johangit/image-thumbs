@@ -5,6 +5,7 @@ namespace JohanCode\ImageThumbs;
 use File as LaravelFile;
 use Image as InterventionImage;
 use Illuminate\Support\Facades\Storage;
+use Mockery\Exception;
 
 trait ImageThumbsTrait
 {
@@ -91,18 +92,21 @@ trait ImageThumbsTrait
 
 
         if (is_string($file)) {
-            // if file path start with cur domain + storage + tempimage - its temp file. just copy it.
-            $tempFilePathPart = url(Storage::disk($diskName)->url("")) . "/tempimage/";
-            if (strpos($file, $tempFilePathPart) === 0) {
+            // 1. file path like 'http://this-site.com/storage/system/tempimage/path/to/file.jpg'
+            // 2. file path like '/local/filesystem/path/to/file.jpg'
+            // 3. file path like 'http://other-site.com/path/to/file.jpg'
+            // 4. exception
+
+            if ($this->isLocalTempImageFile($file, $diskName)) {
                 $file = public_path(str_replace(url(""), "", $file));
+            } elseif ($this->isLocalFilesystemFile($file)) {
+                //ok, go next
+            } elseif ($this->isRemoteFile($file)) {
+                throw new Exception("remote file is disallow to upload");
+            } else {
+                throw new Exception("unknown file path type");
             }
 
-            // if file path start with cur domain + storage - file on server. just copy it.
-            $tempFilePathPart = url(Storage::disk($diskName)->url("")) . "/";
-
-            if (strpos($file, $tempFilePathPart) === 0) {
-                $file = public_path(str_replace(url(""), "", $file));
-            }
 
             $newImageThumbsPathList['original'] = Storage::disk($diskName)->putFileAs($originalFilePath, new \Illuminate\Http\File($file), $newFileName);
         } else if (get_class($file) === "Illuminate\Http\UploadedFile") {
@@ -132,6 +136,24 @@ trait ImageThumbsTrait
         return $newImageThumbsPathList;
     }
 
+    private function isRemoteFile($fileUri)
+    {
+        $isHttp = ((strpos($fileUri, "http://") === 0) || (strpos($fileUri, "https://") === 0));
+        $isRemote = (strpos($fileUri, url("")) === false);
+
+        return ($isHttp && $isRemote);
+    }
+
+    private function isLocalTempImageFile($filePath, $diskName)
+    {
+        $tempFilePathPart = url(Storage::disk($diskName)->url("")) . "/";
+        return (bool)(strpos($filePath, $tempFilePathPart) === 0);
+    }
+
+    private function isLocalFilesystemFile($filePath)
+    {
+        return file_exists($filePath);
+    }
 
     private function getImageValue($fieldName)
     {
