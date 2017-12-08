@@ -125,6 +125,11 @@ trait ImageThumbsTrait
                     call_user_func_array([$img, $method], $arguments);
                 }
 
+                // check if need encode - jpg/png
+                if (isset($manipulations["encode"])) {
+                    $newFileName = substr($newFileName, 0, strrpos($newFileName, ".")) . "." . $manipulations["encode"][0];
+                }
+
                 $newFileFullPath = public_path(Storage::disk($diskName)->url("") . $filePath . "/" . $newFileName);
                 $img->save($newFileFullPath);
 
