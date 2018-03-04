@@ -171,7 +171,7 @@ trait ImageThumbsTrait
             $convertUri = function ($valuesList) use ($diskName) {
                 $result = [];
                 foreach ($valuesList as $type => $uri) {
-                    $result[$type] = env("APP_URL") . Storage::disk($diskName)->url($uri);
+                    $result[$type] = url(Storage::disk($diskName)->url($uri));
                 }
 
                 return $result;
