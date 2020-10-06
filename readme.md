@@ -1,3 +1,5 @@
+**This package is not maintained now**
+
 # Laravel image thumbs
 
 
